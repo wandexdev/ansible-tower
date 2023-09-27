@@ -1,0 +1,52 @@
+---
+- name: Endpoint Monitoring Playbook
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Check System Uptime
+      command: uptime
+      register: uptime_result
+      ignore_errors: yes
+
+    - name: Check Free Disk Space
+      command: df -h
+      register: disk_space_result
+
+    - name: Check Running Services
+      service_facts:
+      register: service_info
+
+    - name: Check Application Health (Example: HTTP)
+      uri:
+        url: http://localhost  # Replace with the URL of your application
+        return_content: yes
+      register: app_health_result
+      ignore_errors: yes 
+
+# Add a separate task to send the email
+- name: Send Monitoring Report via Gmail
+  hosts: localhost  # Run this task on the Ansible control node
+  gather_facts: no  # We don't need to gather facts here
+
+  tasks:
+    - name: Send email
+      python: |
+        import yagmail
+
+        # Create a yagmail.SMTP() instance
+        smtp = yagmail.SMTP('rajirisikat@gmail.com', 'rajiyewande')
+
+        # Compose and send the email
+        contents = [
+            "System Uptime: {{ hostvars[inventory_hostname]['uptime_result']['stdout'] }}",
+            "Disk Space: {{ hostvars[inventory_hostname]['disk_space_result']['stdout'] }}",
+            "Running Services: {{ hostvars[inventory_hostname]['service_info']['ansible_facts']['services'] | to_nice_json }}",
+            "Application Health: {{ hostvars[inventory_hostname]['app_health_result']['status'] }}",
+        ]
+        subject = "Endpoint Monitoring Report for {{ inventory_hostname }}"
+        to = ["tiwande04@gmail.com"]  # Replace with the recipient's email address
+        smtp.send(to=to, subject=subject, contents=contents)
+
+      delegate_to: localhost
+      run_once: true  # Ensure the email task runs only once
