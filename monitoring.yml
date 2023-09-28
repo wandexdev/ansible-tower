@@ -17,11 +17,11 @@
       service_facts:
       register: service_info
 
-    - name: Check Application Health (Example: HTTP)
-      uri:
-        url: http://localhost  # Replace with the URL of your application
-        return_content: yes
-      register: app_health_result
+#    - name: Check Application Health (Example: HTTP)
+#      uri:
+#        url: http://localhost  # Replace with the URL of your application
+#        return_content: yes
+#      register: app_health_result
       ignore_errors: yes 
 
 # Add a separate task to send the email
