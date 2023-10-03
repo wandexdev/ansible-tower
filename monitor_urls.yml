@@ -1,0 +1,45 @@
+---
+- name: Monitor Third-Party URLs
+  hosts: localhost
+  gather_facts: no
+  vars:
+    urls:
+      - https://nibsstsq.com
+      - https://quickteller.com
+      - https://crc.com
+      - https://crs.com
+      - https://google.com
+    email_recipients:
+      - Risikat.Raji@Sterling.ng
+      - EOAM@Sterling.ng
+      - tiwande04@gmail.com
+    mailhog_server: "172.20.10.2"
+
+  tasks:
+    - name: Check URL Availability
+      community.general.uri:
+        url: "{{ item }}"
+      register: url_result
+      with_items: "{{ urls }}"
+      ignore_errors: yes
+
+    - name: Notify on Downtime
+      debug:
+        msg: "URL {{ item.item }} is down!"
+      when: url_result.results | selectattr('status', 'equalto', 0) | list | count > 0
+      with_items: "{{ url_result.results }}"
+
+    - name: Send Email Notification
+      geerlingguy.mailhog_mail:
+        mailhog_host: "{{ mailhog_server }}"
+        mailhog_port: 8025
+        mailhog_subject: "Third Party URL Downtime Alert"
+        mailhog_body: |
+          The following URLs are currently down:
+          {% for item in url_result.results %}
+          {% if item.status == 0 %}
+            - {{ item.item }}
+          {% endif %}
+          {% endfor %}
+        mailhog_to: "{{ email_recipients }}"
+      when: url_result.results | selectattr('status', 'equalto', 0) | list | count > 0
