@@ -43,3 +43,4 @@
           {% endfor %}
         mailhog_to: "{{ email_recipients }}"
       when: url_result.results | selectattr('status', 'equalto', 0) | list | count > 0
+
