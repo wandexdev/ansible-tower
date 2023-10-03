@@ -4,7 +4,6 @@
   gather_facts: no
   vars:
     urls:
-      - https://nibsstsq.com
       - https://quickteller.com
       - https://crc.com
       - https://crs.com
@@ -30,7 +29,7 @@
       with_items: "{{ url_result.results }}"
 
     - name: Send Email Notification
-      geerlingguy.mailhog:
+      community.general.mail:
         mailhog_host: "{{ mailhog_server }}"
         mailhog_port: 8025
         mailhog_subject: "Third Party URL Downtime Alert"
