@@ -30,7 +30,7 @@
       with_items: "{{ url_result.results }}"
 
     - name: Send Email Notification
-      geerlingguy.mailhog_mail:
+      geerlingguy.mailhog:
         mailhog_host: "{{ mailhog_server }}"
         mailhog_port: 8025
         mailhog_subject: "Third Party URL Downtime Alert"

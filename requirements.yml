@@ -1,0 +1,4 @@
+---
+- name: geerlingguy.mailhog
+  src: https://github.com/geerlingguy/ansible-role-mailhog
+  version: v3.1.0
