@@ -17,7 +17,7 @@
 
   tasks:
     - name: Check URL Availability
-      community.general.uri:
+      ansible.builtin.uri:
         url: "{{ item }}"
       register: url_result
       with_items: "{{ urls }}"
